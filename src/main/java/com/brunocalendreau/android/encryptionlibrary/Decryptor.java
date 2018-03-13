@@ -29,16 +29,12 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import static com.brunocalendreau.android.encryptionlibrary.EncryptorConstants.*;
+
 public class Decryptor {
 
     private static final String TAG = Decryptor.class.getSimpleName();
 
-    private static final String AES_MODE_API23 = "AES/GCM/NoPadding";
-    private static final String AES_MODE_OLD = "AES/ECB/PKCS7Padding";
-    private static final String RSA_MODE = "RSA/ECB/PKCS1Padding";
-    private static final String ANDROID_KEY_STORE = "AndroidKeyStore";
-
-    private static final String ENCRYPTED_KEY = "Encrypted_AES";
     private static KeyStore keyStore;
 
     static {
@@ -55,11 +51,11 @@ public class Decryptor {
     private SharedPreferences sp;
 
     /*
-     *  @param SharedPreferences = used for API < 23 to store encrypted AES Key
+     *  @param ctx = used for API < 23 to retrieve encrypted AES Key
      */
-    public Decryptor(Context ctx, @Nullable SharedPreferences sp) {
+    public Decryptor(@Nullable Context ctx) {
         this.ctx = ctx;
-        this.sp = sp;
+        this.sp = ctx.getSharedPreferences(SHARED_PREFERENCE_NAME, ctx.MODE_PRIVATE);
     }
 
     static byte[] rsaDecrypt(final String alias, byte[] encrypted) throws Exception {
@@ -124,7 +120,7 @@ public class Decryptor {
             if (sp == null) {
                 throw new RuntimeException("You must pass a SharedPreferences object in constructor for API < 23");
             }
-            String encryptedKeyB64 = sp.getString(ENCRYPTED_KEY, null);
+            String encryptedKeyB64 = sp.getString(PREFERENCES_ENCRYPTED_KEY, null);
             if (encryptedKeyB64 == null) {
                 Log.d(TAG, "Can't find the AES key");
                 return null;

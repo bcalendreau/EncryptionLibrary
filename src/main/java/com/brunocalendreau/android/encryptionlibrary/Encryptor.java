@@ -28,15 +28,9 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.x500.X500Principal;
 
+import static com.brunocalendreau.android.encryptionlibrary.EncryptorConstants.*;
+
 public class Encryptor {
-
-    private static final String AES_MODE_API23 = "AES/GCM/NoPadding";
-    private static final String AES_MODE_OLD = "AES/ECB/PKCS7Padding";
-    private static final String RSA_MODE = "RSA/ECB/PKCS1Padding";
-
-    private static final String ANDROID_KEY_STORE = "AndroidKeyStore";
-
-    private static final String PREFERENCES_ENCRYPTED_KEY = "Encrypted_AES";
 
     private static final String TAG = Encryptor.class.getSimpleName();
 
@@ -47,11 +41,11 @@ public class Encryptor {
     private byte[] iv;
 
     /*
-     *   @param SharedPreferences = used for API < 23 to store encrypted AES Key
+     *   @param ctx = used for API < 23 to generate RSA keys and store the crypted AES Key in SharedPreferences
      */
-    public Encryptor(Context ctx, @Nullable SharedPreferences sp) {
+    public Encryptor(@Nullable Context ctx) {
         this.ctx = ctx;
-        this.sp = sp;
+        sp = ctx.getSharedPreferences(SHARED_PREFERENCE_NAME, ctx.MODE_PRIVATE);
         try {
             keyStore = KeyStore.getInstance(ANDROID_KEY_STORE);
             keyStore.load(null);
